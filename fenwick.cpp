@@ -1,7 +1,7 @@
 struct fenwick {
     ll n;
     vector<ll> f;
-    fenwick(ll n) : n(n), f(n){};
+    fenwick(ll n) : n(n), f(n + 1){};
     ll sum(ll ind) {
         ll res = 0;
         ll i = ind;
@@ -12,10 +12,9 @@ struct fenwick {
         return res;
     }
     ll sum(ll l, ll r) {
-        return (sum(r - 1) - sum(l - 2));
+        return (sum(r) - sum(l - 1));
     }
     void inc(ll x) {
-        x -= 1;
         while (x < n) {
             f[x]++;
             x = (x | (x + 1));
