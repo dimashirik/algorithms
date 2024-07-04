@@ -15,7 +15,7 @@ struct fenwick {
         return (sum(r) - sum(l - 1));
     }
     void inc(ll x, int v) {
-        while (x < n) {
+        while (x <= n) {
             f[x] += v;
             x = (x | (x + 1));
         }
