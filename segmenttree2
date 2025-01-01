@@ -1,0 +1,69 @@
+struct Node{
+    ll maximum;
+    ll push;
+    Node() : maximum(-INF), push(0){}
+    Node(ll maximum) : maximum(maximum){}
+    void apply(ll x, ll l, ll r) {
+        push += x;
+        maximum += x;
+    }
+};
+struct SegmentTree{
+    ll n;
+    vector<Node> tree;
+    SegmentTree(ll n) : n(n), tree(4 * n){}
+    void Push(ll v, ll l, ll r) {
+        if (tree[v].push != 0 && 2 * v + 1 < 4 * n) {
+            ll mid = (l + r) / 2;
+            tree[2 * v + 1].apply(tree[v].push, l, mid);
+            tree[2 * v + 2].apply(tree[v].push, mid, r);
+            tree[v].push = 0;
+        }
+    }
+    void print() {
+        ll layer = 4 * n;
+        for (ll i = 0; i < 4 * n; i++) {
+            cout << setw(layer) << tree[i].maximum << " ";
+            if (__builtin_popcount(i + 2) == 1) {
+                layer /= 2;
+                cout << "\n";
+            }
+        }
+        cout << "\n";
+    }
+    void build(vector<ll>& a, ll v, ll l, ll r) {
+        if (r - l == 1) {
+            tree[v] = a[l];
+            return;
+        }
+        ll mid = (l + r) / 2;
+        build(a, 2 * v + 1, l, mid);
+        build(a, 2 * v + 2, mid, r);
+        tree[v].maximum = max(tree[2 * v + 1].maximum, tree[2 * v + 2].maximum);
+    }
+    void update(ll v, ll lt, ll rt, ll lq, ll rq, ll add) {
+        if (rq <= lt || rt <= lq) {
+            return;
+        }
+        if (lq <= lt && rt <= rq) {
+            tree[v].apply(add, lt, rt);
+            return;
+        }
+        ll mid = (lt + rt) / 2;
+        Push(v, lt, rt);
+        update(2 * v + 1, lt, mid, lq, rq, add);
+        update(2 * v + 2, mid, rt, lq, rq, add);
+        tree[v].maximum = max(tree[2 * v + 1].maximum, tree[2 * v + 2].maximum);
+    }
+    ll get_max(ll v, ll lt, ll rt, ll lq, ll rq) {
+        if (rq <= lt || rt <= lq) {
+            return -INF;
+        }
+        if (lq <= lt && rt <= rq) {
+            return tree[v].maximum;
+        }
+        ll mid = (lt + rt) / 2;
+        Push(v, lt, rt);
+        return max(get_max(2 * v + 1, lt, mid, lq, rq), get_max(2 * v + 2, mid, rt, lq, rq));
+    }
+};
